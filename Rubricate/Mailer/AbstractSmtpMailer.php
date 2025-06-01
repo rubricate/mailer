@@ -41,11 +41,16 @@ abstract class AbstractSmtpMailer
     protected function authLogin()
     {
         $this->write("AUTH LOGIN");
-        $this->read();
+        $this->expect(334);
         $this->write(base64_encode($this->username));
-        $this->read();
+        $this->expect(334);
         $this->write(base64_encode($this->password));
-        $this->read();
+
+        $response = $this->read();
+
+        if (strpos($response, '535') === 0) {
+            throw new \Exception("SMTP authentication failed: Invalid username or password.");
+        }
     }
 
     protected function headers($to, $subject, $message, $isHtml = false)
@@ -66,6 +71,12 @@ abstract class AbstractSmtpMailer
         $headers .= "\r\n";
 
         $this->write($headers . $message . "\r\n.");
+        $this->read();
+    }
+
+    public function ehlo()
+    {
+        $this->write("EHLO localhost");
         $this->read();
     }
 
@@ -104,11 +115,15 @@ abstract class AbstractSmtpMailer
         return $response;
     }
 
-    public function ehlo()
+    private function expect($expectedCode)
     {
-        $this->write("EHLO localhost");
-        $this->read();
+        $response = $this->read($this->socket);
+
+        if (substr($response, 0, 3) != $expectedCode) {
+            throw new \Exception("Unexpected response from SMTP server: $response");
+        }
     }
+
 
 }
 
