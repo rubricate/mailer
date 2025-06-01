@@ -1,0 +1,23 @@
+{
+    "name": "rubricate/mailer",
+    "homepage": "https://rubricate.github.io/components/mailer",
+    "description": "Component for sending emails via authenticated SMTP. It works on remote servers with support for sockets (fsockopen) and TLS.",
+    "type": "library",
+    "keywords": ["smtp", "mailer", "mail"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Estefanio N Santos",
+            "email": "estefanions@gmail.com",
+            "homepage": "https://rubricate.github.io/components/mailer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Rubricate\\Mailer\\": "Rubricate/Mailer/"
+        }
+    },
+    "require": {
+        "php": ">=7.2.0"
+    }
+}
