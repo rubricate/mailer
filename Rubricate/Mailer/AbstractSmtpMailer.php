@@ -14,7 +14,7 @@ abstract class AbstractSmtpMailer
 
     private $socket;
 
-    abstract protected function send($to, $subject, $message, $isHtml = false);
+    abstract protected function send($to, $subject, $message, $isHtml = false, $cc = [], $bcc = []);
 
     protected function openSocketConn()
     {
@@ -53,18 +53,34 @@ abstract class AbstractSmtpMailer
         }
     }
 
-    protected function headers($to, $subject, $message, $isHtml = false)
+    protected function headers($to, $subject, $message, $isHtml = false, $cc = [], $bcc = [])
     {
         $this->write("MAIL FROM:<{$this->from}>");
         $this->read();
         $this->write("RCPT TO:<{$to}>");
         $this->read();
+
+        foreach ($cc as $ccEmail) {
+            $this->write("RCPT TO:<{$ccEmail}>");
+            $this->read();
+        }
+
+        foreach ($bcc as $bccEmail) {
+            $this->write("RCPT TO:<{$bccEmail}>");
+            $this->read();
+        }
+
         $this->write("DATA");
         $this->read();
 
         $htmlPlain = ($isHtml ? "text/html": "text/plain");
         $headers = "From: {$this->fromName} <{$this->from}>\r\n";
         $headers .= "To: <$to>\r\n";
+
+        if (!empty($cc)) {
+            $headers .= "Cc: " . implode(', ', $cc) . "\r\n";
+        }
+
         $headers .= "Subject: $subject\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: " . $htmlPlain . "; charset=UTF-8\r\n";

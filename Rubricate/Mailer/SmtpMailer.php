@@ -23,12 +23,12 @@ class SmtpMailer extends AbstractSmtpMailer
         $this->debug    = $debug;
     }
 
-    public function send($to, $subject, $message, $isHtml = false)
+    public function send($to, $subject, $message, $isHtml = false, $cc = [], $bcc = [])
     {
         $this->openSocketConn();
         $this->startTLS();
         $this->authLogin();
-        $this->headers($to, $subject, $message, $isHtml);
+        $this->headers($to, $subject, $message, $isHtml, $cc, $bcc);
         $this->quit();
 
         return true;
